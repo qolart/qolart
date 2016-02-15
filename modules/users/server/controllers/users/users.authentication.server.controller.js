@@ -85,6 +85,7 @@ exports.signout = function (req, res) {
  */
 exports.oauthCall = function (strategy, scope) {
   return function (req, res, next) {
+    console.log('here');
     // Set redirection path on session.
     // Do not redirect to a signin or signup page
     if (noReturnUrls.indexOf(req.query.redirect_to) === -1) {
@@ -106,16 +107,20 @@ exports.oauthCallback = function (strategy) {
 
     passport.authenticate(strategy, function (err, user, redirectURL) {
       if (err) {
+        console.log('here3');
         return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
       }
       if (!user) {
+        console.log('here4');
         return res.redirect('/authentication/signin');
       }
       req.login(user, function (err) {
+        console.log('here5 : '+user);
+
         if (err) {
           return res.redirect('/authentication/signin');
         }
-
+        
         return res.redirect(redirectURL || sessionRedirectURL || '/');
       });
     })(req, res, next);
@@ -184,8 +189,9 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
       if (!user.additionalProvidersData) {
         user.additionalProvidersData = {};
       }
-
+      
       user.additionalProvidersData[providerUserProfile.provider] = providerUserProfile.providerData;
+
 
       // Then tell mongoose that we've updated the additionalProvidersData field
       user.markModified('additionalProvidersData');
